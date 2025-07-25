@@ -1,0 +1,14 @@
+hata: __APİ direwkt import edilince kullanımda hata veriyor hata mesajı
+      açıklayıcı değil onu geçtim olmayna bir değişkeni yani kodda olmayan
+      geçmeyen bir değişkeni bulamadıgını iddia edip NAMEERROR fırlatıyor
+      bunu anlamam gerek yoksa.... içim rahat etmez
+
+olası sonuç:
+
+mangling hatası::
+
+api başındaki "__" işareti yani iki çizgi hayati önem taşır 
+fonksiyonu/modülü dışarıdan ulaşılamaz kılar bu yüzden nameerror 
+tetikleniyor olması cok olası ve mümkün olmayan değişkeni göstermesini
+hala düşünüyorum..
+
