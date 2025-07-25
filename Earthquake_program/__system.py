@@ -5,4 +5,4 @@ import sys as _s
 class exitGuiThread():
     def __init__(self,*args,**kwargs):
         super().__init__()
-        _s.exit(Gui.sp.exec_())
+        _s.exit(Gui.sp.exec())
