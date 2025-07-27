@@ -15,7 +15,8 @@ class ExampleMap():
 
         ExampleTurkiyeMap = folium.Map(
             location = self.location,
-            zoom_start = self.zoom_level
+            zoom_start = self.zoom_level,
+            tiles='Cartodb dark_matter'
         )
 
         return ExampleTurkiyeMap
@@ -33,17 +34,19 @@ class ZoomMap():
         return NewMap.get_root().render()
 
 class DrawEarthquakeZones():
-    def __init__(self,Map,latitude,Longtidue,Magnitude):
+    def __init__(self,Map,latitude,Longtidue,Magnitude,Country,City):
         super().__init__()
         self.map = Map
                               
         self.latidude = latitude
         self.longtidude = Longtidue
         self.magnitude = Magnitude
+        self.country = Country
+        self.city = City
 
 
     def Draw(self):
-        popup = f'Büyüklük:{self.magnitude}'
+        popup = f'Ülke:{self.country}\nŞehir:{self.city}\nBüyüklük:{str(self.magnitude)}'
 
         self.marker = folium.Marker(location=[self.latidude,self.longtidude],
                                     popup=popup,
