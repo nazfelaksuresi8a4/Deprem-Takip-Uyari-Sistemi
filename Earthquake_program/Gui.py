@@ -65,11 +65,81 @@ class LoadGui(QMainWindow):
         self.map_zoom_slider.setValue(6)
         self.map_zoom_slider.setRange(0, 19)
 
-        self.start_time = QLineEdit()
-        self.end_time = QLineEdit()
-        self.start_hms = QLineEdit()
-        self.end_hms = QLineEdit()
-        self.limit_input = QLineEdit()
+        self.start_time_splitter = QSplitter(Qt.Horizontal)
+        self.end_time_splitter = QSplitter(Qt.Horizontal)
+
+        self.start_date_splitter = QSplitter(Qt.Horizontal)
+        self.end_date_splitter = QSplitter(Qt.Horizontal)
+
+        #time-side#
+        #start-side#
+        #hour#
+        self.start_time_setting_h = QSpinBox()
+        self.start_time_setting_h.setValue(0)
+        self.start_time_setting_h.setRange(0,23)
+
+        #minute#
+        self.start_time_setting_m = QSpinBox()
+        self.start_time_setting_m.setValue(0)
+        self.start_time_setting_m.setRange(0,59)
+
+        #second#
+        self.start_time_setting_s = QSpinBox()
+        self.start_time_setting_s.setValue(0)
+        self.start_time_setting_s.setRange(0,59)
+
+        #end-side#
+        #hour#
+        self.end_time_setting_h = QSpinBox()
+        self.end_time_setting_h.setValue(0)
+        self.end_time_setting_h.setRange(0,23)
+
+        #minute#
+        self.end_time_setting_m = QSpinBox()
+        self.end_time_setting_m.setValue(0)
+        self.end_time_setting_m.setRange(0,59)
+        
+        #second#
+        self.end_time_setting_s = QSpinBox()
+        self.end_time_setting_s.setValue(0)
+        self.end_time_setting_s.setRange(0,59)
+
+        #date-side#
+        #start-side#
+        #1#
+        self.start_date_setting_c = QSpinBox()
+        self.start_date_setting_c.setValue(0)
+        self.start_date_setting_c.setRange(0,2050)
+
+        #2#
+        self.start_date_setting_m = QSpinBox()
+        self.start_date_setting_m.setValue(0)
+        self.start_date_setting_m.setRange(0,12)
+
+        #3#
+        self.start_date_setting_g = QSpinBox()
+        self.start_date_setting_g.setValue(0)
+        self.start_date_setting_g.setRange(0,31)
+
+        #end-side#
+        #1#
+        self.end_date_setting_c = QSpinBox()
+        self.end_date_setting_c.setValue(0)
+        self.end_date_setting_c.setRange(0,2050)
+        
+        #2#
+        self.end_date_setting_m = QSpinBox()
+        self.end_date_setting_m.setValue(0)
+        self.end_date_setting_m.setRange(0,12)
+
+        #3#
+        self.end_date_setting_g = QSpinBox()
+        self.end_date_setting_g.setValue(0)
+        self.end_date_setting_g.setRange(0,31)
+
+        self.limit_input = QSpinBox()
+        self.limit_input.setValue(81)
+        self.limit_input.setRange(1,1500)
 
         self.start_time_label = QLabel(text='Başlangıç yılı')
         self.end_time_label = QLabel(text='Bitiş yılı')
@@ -77,21 +147,16 @@ class LoadGui(QMainWindow):
         self.end_hms_label = QLabel(text='Bitiş Saat/Dakika/Saniye')
         self.limit_label = QLabel(text='Kaç veri çekilsin')
 
-        self.start_time.setPlaceholderText('Başlangıç yılını girin...')
-        self.end_time.setPlaceholderText('Bitiş yılını girin...')
-        self.start_hms.setPlaceholderText('Başlangıç Saat/Dakika/Saniyesini girin...')
-        self.end_hms.setPlaceholderText('Bitiş Başlangıç Saat/Dakika/Saniyesini girin...')
-        self.limit_input.setPlaceholderText('Kaç tane konum bilgisi istersin...')
+        #self.start_time.setPlaceholderText('Başlangıç yılını girin...')
+        #self.end_time.setPlaceholderText('Bitiş yılını girin...')
+        #self.start_hms.setPlaceholderText('Başlangıç Saat/Dakika/Saniyesini girin...')
+        #self.end_hms.setPlaceholderText('Bitiş Başlangıç Saat/Dakika/Saniyesini girin...')
+        #self.limit_input.setPlaceholderText('Kaç tane konum bilgisi istersin...')
 
         self.start_time_label.setAlignment(Qt.AlignCenter)
         self.end_time_label.setAlignment(Qt.AlignCenter)
         self.start_hms_label.setAlignment(Qt.AlignCenter)
         self.end_hms_label.setAlignment(Qt.AlignCenter)
-
-        self.start_time.setAlignment(Qt.AlignCenter)
-        self.end_time.setAlignment(Qt.AlignCenter)
-        self.start_hms.setAlignment(Qt.AlignCenter)
-        self.end_hms.setAlignment(Qt.AlignCenter)
 
         self.apply_earthquake_datas = QPushButton(text='Sorgula')
 
@@ -122,9 +187,25 @@ class LoadGui(QMainWindow):
         self.splitters_side.addWidget(self.map_side)
         self.splitters_side.addWidget(self.map_actions_splitter)
 
-        self.earthquake_data_splitter.addWidget(self.select_proveince_label)
+        #self.earthquake_data_splitter.addWidget(self.select_proveince_label)
         self.earthquake_data_splitter.addWidget(self.city_label)
         self.earthquake_data_splitter.addWidget(self.citys_list)
+
+        self.start_time_splitter.addWidget(self.start_time_setting_h)
+        self.start_time_splitter.addWidget(self.start_time_setting_m)
+        self.start_time_splitter.addWidget(self.start_time_setting_s)
+
+        self.end_time_splitter.addWidget(self.end_time_setting_h)
+        self.end_time_splitter.addWidget(self.end_time_setting_m)
+        self.end_time_splitter.addWidget(self.end_time_setting_s)
+
+        self.start_date_splitter.addWidget(self.start_date_setting_c)
+        self.start_date_splitter.addWidget(self.start_date_setting_m)
+        self.start_date_splitter.addWidget(self.start_date_setting_g)
+
+        self.end_date_splitter.addWidget(self.end_date_setting_c)
+        self.end_date_splitter.addWidget(self.end_date_setting_m)
+        self.end_date_splitter.addWidget(self.end_date_setting_g)
 
         self.map_side.addWidget(self.map_label)
         self.map_side.addWidget(self.webwidget)
@@ -138,19 +219,17 @@ class LoadGui(QMainWindow):
         self.map_actions_splitter.addWidget(self.earthquake_data_splitter)
 
         self.earthquake_data_splitter.addWidget(self.start_hms_label)
-        self.earthquake_data_splitter.addWidget(self.start_hms)
+        self.earthquake_data_splitter.addWidget(self.start_time_splitter)
         self.earthquake_data_splitter.addWidget(self.end_hms_label)
-        self.earthquake_data_splitter.addWidget(self.end_hms)
+        self.earthquake_data_splitter.addWidget(self.end_time_splitter)
         self.earthquake_data_splitter.addWidget(self.start_time_label)
-        self.earthquake_data_splitter.addWidget(self.start_time)
+        self.earthquake_data_splitter.addWidget(self.start_date_splitter)
         self.earthquake_data_splitter.addWidget(self.end_time_label)
-        self.earthquake_data_splitter.addWidget(self.end_time)
+        self.earthquake_data_splitter.addWidget(self.end_date_splitter)
         self.earthquake_data_splitter.addWidget(self.limit_label)
         self.earthquake_data_splitter.addWidget(self.limit_input)
         self.earthquake_data_splitter.addWidget(self.apply_earthquake_datas)
-        for __widget in container:
-            __widget.setStyleSheet('background-color:white')
-            self.earthquake_data_splitter.addWidget(__widget)
+
 
         #setting-widget-2#
         self.city_label.setAlignment(Qt.AlignCenter)
@@ -204,16 +283,28 @@ class LoadGui(QMainWindow):
         self.new_map = fl.Map(location=[39,35],
                               zoom_start=6)
         
-        start_time = self.start_time.text()
-        end_time = self.end_time.text()
-        start_hms = self.start_hms.text()
-        end_hms = self.end_hms.text()
-        lim_data = self.limit_input.text()
+        start_hms_h = self.start_time_setting_h.value()
+        start_hms_m = self.start_time_setting_m.value()
+        start_hms_s = self.start_time_setting_s.value()
 
-        start_date = f'{start_time}T{start_hms}'
-        end_date = f'{end_time}T{end_hms}'
+        end_hms_h = self.end_time_setting_h.value()
+        end_hms_m = self.end_time_setting_m.value()
+        end_hms_s = self.end_time_setting_s.value()
 
-        host = CustomData(start=start_date,end=end_date,lim=lim_data)
+        start_date_c = self.start_date_setting_c.value()
+        start_date_m = self.start_date_setting_m.value()
+        start_date_g = self.start_date_setting_g.value()
+
+        end_date_c = self.end_date_setting_c.value()
+        end_date_m = self.end_date_setting_m.value()
+        end_date_g = self.end_date_setting_g.value()
+
+        self.start_date_tokenized = f'{start_date_c}-{start_date_m}-{start_date_g}T{start_hms_h}-{start_hms_m}-{start_hms_s}'
+        self.end_date_tokenized = f'{end_date_c}-{end_date_m}-{end_date_g}T{end_hms_h}-{end_hms_m}-{end_hms_s}'
+
+        lim_data = self.limit_input.value()
+
+        host = CustomData(start=self.start_date_tokenized, end=self.end_date_tokenized, lim=lim_data)
 
         host_data = host.Parse()
 
@@ -221,7 +312,9 @@ class LoadGui(QMainWindow):
             MarkerFunction = Create_map.DrawEarthquakeZones(Map=self.new_map,
                                            latitude=data[0],
                                            Longtidue=data[1],
-                                           Magnitude=data[2])
+                                           Magnitude=data[2],
+                                           Country=data[3],
+                                           City=data[4])
 
             MarkedMap = MarkerFunction.Draw()
 
