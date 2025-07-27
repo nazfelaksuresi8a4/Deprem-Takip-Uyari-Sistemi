@@ -1,0 +1,69 @@
+QMainWindow{
+    background-color: rgb(25, 19, 19);
+}
+QWidget{
+    background-color: rgb(25, 19, 19);
+}
+QSplitter{
+    background-color: rgb(25, 19, 19);
+}
+
+QPushButton{
+    background-color: rgb(41, 41, 41);
+    color: white;
+    border: 0.7px solid gold;
+    border-radius: 8px;
+    font-weight: bolder;
+    font-size: 15px;
+}
+QPushButton:hover{
+    background-color: rgb(92, 16, 16);
+    color: rgb(108, 93, 7);
+    font-size: 14px;
+}
+QPushButton:pressed{
+    background-color: red;
+    color: gold;
+    font-size: 20px;
+}
+
+QLineEdit{
+    background-color: rgba(41, 41, 41);
+    color: rgb(68, 255, 0);
+    border: 0.7px solid gold;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 15px;
+}
+QLineEdit:hover{
+    background-color: rgb(255, 0, 0);
+    color: rgb(108, 93, 7);
+    font-size: 18px;
+}
+
+QComboBox{
+    background-color: rgb(41, 31, 31);
+    color: rgb(255, 255, 255);
+    border: 0.7px solid gold;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+QLabel{
+    background-color: rgb(38, 38, 38);
+    color: rgb(255, 255, 255);
+    border: 0.7px solid rgb(255, 0, 0);
+    border-radius: 4px;
+    font-weight: bolder;
+    font-size: 18px;    
+}
+
+QSpinBox{
+    background-color: rgb(41, 41, 41);
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    border: 0.7px solid gold;
+}
