@@ -6,8 +6,8 @@ class CustomData():
         super().__init__()
 
         #data-arrays#
+        self.country = []
         self.city = []
-        self.province = []
         self.magnitude = []
         self.district = []
         self.longitude = []
@@ -39,7 +39,7 @@ class CustomData():
             pass
         
         try:
-            self.data = custom_response.json()
+            self.data = custom_response
             self.json_index = 1
         
         except Exception as __jsonDecodeError:
@@ -47,13 +47,14 @@ class CustomData():
             print(f'Json decode error: {__jsonDecodeError}')
             pass
         
-        try:
-            if self.response_index == 1 and self.json_index == 1:
-                for data in self.data:
-                    yield [data['latitude'],data['longitude'],data['magnitude']]
+
+        if self.response_index == 1 and self.json_index == 1:
+
+            for data in self.data.json():
+                yield [data['latitude'],data['longitude'],data['magnitude'],data['country'],data['province']]
+
         
-        except Exception as __DataReturnException:
-            print(f'Data return exception: {__DataReturnException}')
+
 
 class Returner():
     def __init__(self):
