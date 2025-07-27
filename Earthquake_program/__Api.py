@@ -60,3 +60,12 @@ class Returner():
         super().__init__()
         __function = CustomData(start='2024-09-16T10:00:00',end='2025-09-16T10:00:00',lim=100)
         __generator_object = __function.Parse()
+
+
+            
+            
+
+
+
+
+            
