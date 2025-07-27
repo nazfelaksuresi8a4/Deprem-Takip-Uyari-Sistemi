@@ -8,6 +8,7 @@ from Create_map import DrawEarthquakeZones
 import file_actions
 import json
 import sys
+import folium as fl
 
 class LoadGui(QMainWindow):
     def __init__(self):
@@ -200,6 +201,9 @@ class LoadGui(QMainWindow):
         self.webwidget.reload()
     
     def connect_api(self):
+        self.new_map = fl.Map(location=[39,35],
+                              zoom_start=6)
+        
         start_time = self.start_time.text()
         end_time = self.end_time.text()
         start_hms = self.start_hms.text()
@@ -214,7 +218,7 @@ class LoadGui(QMainWindow):
         host_data = host.Parse()
 
         for data in host_data:
-            MarkerFunction = Create_map.DrawEarthquakeZones(Map=self.Turkiye_map,
+            MarkerFunction = Create_map.DrawEarthquakeZones(Map=self.new_map,
                                            latitude=data[0],
                                            Longtidue=data[1],
                                            Magnitude=data[2])
