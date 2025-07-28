@@ -22,14 +22,19 @@ class ExampleMap():
         return ExampleTurkiyeMap
 
 class ZoomMap():
-    def zoomMap(value,location):
+    def zoomMap(value,location,marker_locations,popups):
         __location = location
         Zoom_level = value
 
         NewMap = folium.Map(
             location = __location,
-            zoom_start = Zoom_level
+            zoom_start = Zoom_level,
+            tiles='Cartodb dark_matter'
         )
+
+        for fdata__,popup in marker_locations,popups:
+            folium.Marker(location=fdata__,
+                          popup=popup).add_to(NewMap)
 
         return NewMap.get_root().render()
 
