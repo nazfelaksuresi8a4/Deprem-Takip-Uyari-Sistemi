@@ -1,5 +1,6 @@
 import requests 
 import Gui
+import json
 
 class CustomData():
     def __init__(self,start,end,lim):
@@ -34,12 +35,14 @@ class CustomData():
             self.response_index = 1
 
         except Exception as CustomDataResponseException:
-            print(f'CustomData response error: {CustomDataResponseException}')
+            (f'CustomData response error: {CustomDataResponseException}')
             self.response_index = 0
             pass
         
         try:
-            self.data = custom_response
+            self.data = custom_response.json()
+            #self.data = json.loads(self.data)
+
             self.json_index = 1
         
         except Exception as __jsonDecodeError:
@@ -49,9 +52,15 @@ class CustomData():
         
 
         if self.response_index == 1 and self.json_index == 1:
+            none_type_array  = []
 
-            for data in self.data.json():
-                yield [data['latitude'],data['longitude'],data['magnitude'],data['country'],data['province']]
+            for data in self.data:
+               if data == None:
+                   none_type_array.append(data)
+               else:
+                 
+                 yield [data['latitude'],data['longitude'],data['magnitude'],data['country'],data['province']]
+
 
         
 
