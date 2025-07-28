@@ -28,8 +28,8 @@ QPushButton:pressed{
 }
 
 QLineEdit{
-    background-color: rgba(41, 41, 41);
-    color: rgb(68, 255, 0);
+    background-color: rgb(56, 55, 55);
+    color: rgb(178, 178, 178);
     border: 0.7px solid gold;
     border-radius: 8px;
     font-weight: bold;
@@ -51,19 +51,37 @@ QComboBox{
 }
 
 QLabel{
-    background-color: rgb(38, 38, 38);
+    background-color: rgb(41, 41, 41);
     color: rgb(255, 255, 255);
-    border: 0.7px solid rgb(255, 0, 0);
-    border-radius: 4px;
+    font-size: 18px;
     font-weight: bolder;
-    font-size: 18px;    
+    border-radius: 4px;
+    border: 0.7px solid gold;  
 }
 
 QSpinBox{
-    background-color: rgb(41, 41, 41);
-    color: rgb(255, 255, 255);
-    font-size: 14px;
-    font-weight: bold;
+    background-color: rgb(62, 49, 49);
+    color: rgb(224, 223, 223);
+    border: 0.7px solid rgb(85, 85, 85);
     border-radius: 4px;
-    border: 0.7px solid gold;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+QDateEdit{
+    background-color: rgb(62, 49, 49);
+    color: rgb(224, 223, 223);
+    border: 0.7px solid rgb(85, 85, 85);
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+QTimeEdit{
+    background-color: rgb(62, 49, 49);
+    color: rgb(224, 223, 223);
+    border: 0.7px solid rgb(85, 85, 85);
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
 }
