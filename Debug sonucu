@@ -1,4 +1,4 @@
-hata: __APİ direwkt import edilince kullanımda hata veriyor hata mesajı
+hata-1: __APİ direwkt import edilince kullanımda hata veriyor hata mesajı
       açıklayıcı değil onu geçtim olmayna bir değişkeni yani kodda olmayan
       geçmeyen bir değişkeni bulamadıgını iddia edip NAMEERROR fırlatıyor
       bunu anlamam gerek yoksa.... içim rahat etmez
@@ -11,4 +11,15 @@ api başındaki "__" işareti yani iki çizgi hayati önem taşır
 fonksiyonu/modülü dışarıdan ulaşılamaz kılar bu yüzden nameerror 
 tetikleniyor olması cok olası ve mümkün olmayan değişkeni göstermesini
 hala düşünüyorum..
+
+
+
+
+hata-2:__APİ dan kaynaklı gibi gözüken ama yanıltıcı olan bir hata türü (TypeError: string indices must be integers not 'str')
+
+hatanın kaynağı: zaman tokeni 
+
+açıklama: zaman tokeni gui kısmında verilen zaman aralığının f string ile tokenize edilmiş hali ancak bir sorunu var yıl kısmındaki "-" kesme işaretleri hms(hour-minute-second) kısmındada yapılmaya çalışıldıgı için api hata veriyor ve 
+          __Api kısmındaki  ['longitude'] gibi keylerde boşa çıkıyor ortadan kayboluyor buda bu hatayı teteiklkiyor "stringi string ile slice etmeye çalışmak" kolay gibi dursada bulana kadar canım cıktı
+
 
