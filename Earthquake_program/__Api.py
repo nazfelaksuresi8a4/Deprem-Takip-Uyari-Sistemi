@@ -61,10 +61,6 @@ class CustomData():
                  
                  yield [data['latitude'],data['longitude'],data['magnitude'],data['country'],data['province']]
 
-
-        
-
-
 class Returner():
     def __init__(self):
         super().__init__()
