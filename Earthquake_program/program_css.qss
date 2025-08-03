@@ -49,7 +49,8 @@ QLineEdit:hover{
 QComboBox{
     background-color: rgb(41, 31, 31);
     color: rgb(255, 255, 255);
-    border: 0.7px solid gold;
+    text-decoration-color: white;
+    border: 0.7px solid rgb(88, 88, 88);
     border-radius: 8px;
     font-weight: bold;
     font-size: 15px;
