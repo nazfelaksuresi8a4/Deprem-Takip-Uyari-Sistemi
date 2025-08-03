@@ -1,7 +1,7 @@
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtWebEngineWidgets import QWebEngineView
+from qtpy.QtCore import *
+from qtpy.QtWidgets import *
+from qtpy.QtGui import *
+from qtpy.QtWebEngineWidgets import QWebEngineView
 import Create_map
 from __Api import CustomData
 from Create_map import DrawEarthquakeZones
@@ -60,6 +60,12 @@ class LoadGui(QMainWindow):
         #tool-widgets#
         self.webwidget = QWebEngineView()
 
+        day_selector_label = QLabel(text='Kaç gün öncenin verilerini istersiniz')
+        self.day_selector = QSpinBox()
+
+        self.day_selector.setRange(0,30)
+        self.day_selector.setValue(2)
+
         self.city_label = QLabel(text='Deprem Sorgula')
         self.city_label.setObjectName('sort_label')
 
@@ -79,9 +85,9 @@ class LoadGui(QMainWindow):
 
         recent_earthquakes_label = QLabel(text='Son depremler')
 
-        earthquake_date_label = QLabel(text='Başlangıç tarihi(Eski)')
+        earthquake_date_label = QLabel(text='Başlangıç tarihi')
         self.earthquake_date = QDateEdit()
-        earthquake_time_label = QLabel(text='Başlangıç saati(Eski)')
+        earthquake_time_label = QLabel(text='Başlangıç saati')
         self.earthquake_time = QTimeEdit()
 
         recent_earthquake_date_label = QLabel(text='Bitiş tarihi(Güncel)')
@@ -147,11 +153,15 @@ class LoadGui(QMainWindow):
         recent_earthquakes_label.setAlignment(Qt.AlignCenter)
         recent_earthquake_date_label.setAlignment(Qt.AlignCenter)
         recent_earthquake_time_label.setAlignment(Qt.AlignCenter)
-
+        
         recent_earthquakes_label.setObjectName('recent_earthquakes')
 
         self.limit_input.setAlignment(Qt.AlignCenter)
         self.limit_input_2.setAlignment(Qt.AlignCenter)
+        
+        day_selector_label.setAlignment(Qt.AlignCenter)
+        self.day_selector.setAlignment(Qt.AlignCenter)
+
 
         self.start_time_label = QLabel(text='Başlangıç yılı')
         self.end_time_label = QLabel(text='Bitiş yılı')
@@ -208,12 +218,10 @@ class LoadGui(QMainWindow):
         self.recent_earthquakes_splitter.addWidget(self.earthquake_date)
         self.recent_earthquakes_splitter.addWidget(earthquake_time_label)
         self.recent_earthquakes_splitter.addWidget(self.earthquake_time)
-        self.recent_earthquakes_splitter.addWidget(recent_earthquake_date_label)
-        self.recent_earthquakes_splitter.addWidget(self.recent_date)
-        self.recent_earthquakes_splitter.addWidget(recent_earthquake_time_label)
-        self.recent_earthquakes_splitter.addWidget(self.recent_time)
         self.recent_earthquakes_splitter.addWidget(self.limit_label_2)
         self.recent_earthquakes_splitter.addWidget(self.limit_input_2)
+        self.recent_earthquakes_splitter.addWidget(day_selector_label)
+        self.recent_earthquakes_splitter.addWidget(self.day_selector)
         self.recent_earthquakes_splitter.addWidget(self.recent_earthquakes_list)
         self.recent_earthquakes_splitter.addWidget(self.sort_earthquakes)
         self.recent_earthquakes_splitter.addWidget(self.show_recent_earthquakes_with_map)
@@ -228,9 +236,7 @@ class LoadGui(QMainWindow):
         self.map_side.addWidget(self.map_zoom_label)
         self.map_side.addWidget(self.map_zoom_slider)
 
-        #self.earthquake_data_splitter.addWidget(self.select_proveince_label)
         self.earthquake_data_splitter.addWidget(self.city_label)
-        #self.earthquake_data_splitter.addWidget(self.citys_list)
         self.earthquake_data_splitter.addWidget(self.start_hms_label)
         self.earthquake_data_splitter.addWidget(self.start_time_setting)
         self.earthquake_data_splitter.addWidget(self.end_hms_label)
@@ -342,13 +348,21 @@ class LoadGui(QMainWindow):
             QMessageBox.critical(self,'Uyarı',f'{self.start_date} // {self.end_date} tarihleri arasında Deprem görülmemektedir!')
 
     def optimize_dates(self):
+        value = self.day_selector.value()
+        current_date = timezone.current_date(value).returner()
+
         self.recent_date.setDate(QDate().currentDate())
-        self.recent_time.setTime(QTime().currentTime())
+        self.earthquake_date.setDate(current_date)
 
         self.earthquake_date.setDate(QDate.currentDate())
 
     def draw_earthquakes_function(self):
         try:
+            value = self.day_selector.value()
+            current_date = timezone.current_date(value).returner()
+            
+            self.earthquake_date.setDate(current_date)
+
             self.recent_earthquakes_list.clear()
             
             self.new_map_recent = fl.Map(location=[39,35],
@@ -396,6 +410,11 @@ class LoadGui(QMainWindow):
 
     def sort_recent_earthquakes_function(self):
         try:
+            value = self.day_selector.value()
+            current_date = timezone.current_date(value).returner()
+            
+            self.earthquake_date.setDate(current_date)
+
             self.recent_earthquakes_list.clear()
 
             self.start_date_recent = self.recent_date.date().toPyDate()
