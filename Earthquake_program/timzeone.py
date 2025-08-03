@@ -1,14 +1,17 @@
 import datetime
-
+from PyQt5.QtCore import QDate
 class current_date():
-    def __init__(self):  
-        self.year = None
-        self.month = None
-        self.day = None
+    def __init__(self,value):  
+        self.value = value
 
-    def returner():
-        date = datetime.date.today().strftime('%d/%m/%y')
-        date = date.replace('/','-')
+    def returner(self):
+        date = QDate()
+
+        y = QDate().currentDate().getDate()[0]
+        m = QDate().currentDate().getDate()[1] - self.value
+        d = QDate().currentDate().getDate()[2]
+
+        date.setDate(y,m,d)
 
         return date
 
