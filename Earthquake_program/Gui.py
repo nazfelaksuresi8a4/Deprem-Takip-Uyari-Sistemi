@@ -2,6 +2,7 @@ from qtpy.QtCore import *
 from qtpy.QtWidgets import *
 from qtpy.QtGui import *
 from qtpy.QtWebEngineWidgets import QWebEngineView
+import scrapping
 import Create_map
 from __Api import CustomData
 from Create_map import DrawEarthquakeZones
@@ -10,6 +11,46 @@ import file_actions
 import json
 import sys
 import folium as fl
+import threading
+
+class Signal(QObject):
+    signal = pyqtSignal(str)
+
+    def __init__(self,start_hmsmmy,end_hmsmmy,lim,coordinate_matris,coordinates,strings,string_matris,webwidget):
+        super().__init__()
+        self.start_hmsmmy = start_hmsmmy
+        self.end_hmsmmy = end_hmsmmy
+        self.lim_data = lim
+        self.coordinate_matris = coordinate_matris
+        self.coordinates = coordinates
+        self.strings = strings
+        self.webwidget = webwidget
+
+        self.signal.connect(self.run)
+    
+    def run(self):
+        host_data = CustomData(start=self.start_hmsmmy, end=self.end_hmsmmy, lim=str(self.lim_data)).Parse()
+
+        for data in host_data:
+
+            MarkerFunction = Create_map.DrawEarthquakeZones(Map=self.new_map,
+                                            latitude=data[0],
+                                            Longtidue=data[1],
+                                            Magnitude=data[2],
+                                            Country=data[3],
+                                            City=data[4])
+                
+            self.coordinate_matris = [data[0],data[1]]
+            self.string_matris = [data[2],data[3],data[4]]
+                
+            self.coordinates.append(self.coordinate_matris)
+            self.strings.append(self.string_matris)
+                
+            MarkedMap = MarkerFunction.Draw()
+
+            self.webwidget.setHtml(MarkedMap.get_root().render())  
+
+            self.signal.disconnect()
 
 class LoadGui(QMainWindow):
     def __init__(self):
@@ -31,6 +72,12 @@ class LoadGui(QMainWindow):
 
         #map-datas#
         self.location = None
+
+        self.latidude = []
+        self.longitude = []
+        self.magnitude = []
+        self.country = []
+        self.city = []
 
         css_file = r'program_css.qss'
 
@@ -101,9 +148,9 @@ class LoadGui(QMainWindow):
         self.earthquake_date.setDisplayFormat('yyyy-MM-dd')
         self.earthquake_time.setDisplayFormat('HH:mm:ss')
 
-        self.recent_earthquakes_list = QListWidget()
+        self.recent_earthquakes_list = QTableWidget()
         self.sort_earthquakes = QPushButton(text='Son depremleri çek')
-        self.show_recent_earthquakes_with_map = QPushButton('Son depremleri haritada göster')
+        self.show_recent_earthquakes_with_map = QPushButton('Secili depremin detaylarını haritada göster')
         
 
         self.start_time_splitter = QSplitter(Qt.Horizontal)
@@ -134,11 +181,11 @@ class LoadGui(QMainWindow):
 
         self.limit_input = QSpinBox()
         self.limit_input.setValue(81)
-        self.limit_input.setRange(0,2000)
+        self.limit_input.setRange(0,90000)
 
         self.limit_input_2 = QSpinBox()
         self.limit_input_2.setValue(81)
-        self.limit_input_2.setRange(0,2000)
+        self.limit_input_2.setRange(0,90000)
 
         #time-date-settings#
         self.start_time_setting.setDisplayFormat('HH:mm:ss')
@@ -182,6 +229,18 @@ class LoadGui(QMainWindow):
         self.end_time_label.setAlignment(Qt.AlignCenter)
         self.start_hms_label.setAlignment(Qt.AlignCenter)
         self.end_hms_label.setAlignment(Qt.AlignCenter)
+
+        self.recent_earthquakes_list.setColumnCount(7)
+        self.recent_earthquakes_list.setRowCount(100)
+        self.recent_earthquakes_list.resizeRowsToContents()
+
+        self.recent_earthquakes_list.setHorizontalHeaderItem(0,QTableWidgetItem('Tarih(TS)'))
+        self.recent_earthquakes_list.setHorizontalHeaderItem(1,QTableWidgetItem('Enlem'))
+        self.recent_earthquakes_list.setHorizontalHeaderItem(2,QTableWidgetItem('Boylam'))
+        self.recent_earthquakes_list.setHorizontalHeaderItem(3,QTableWidgetItem('Derinlik(Km)'))
+        self.recent_earthquakes_list.setHorizontalHeaderItem(4,QTableWidgetItem('Tip'))
+        self.recent_earthquakes_list.setHorizontalHeaderItem(5,QTableWidgetItem('Büyüklük	'))
+        self.recent_earthquakes_list.setHorizontalHeaderItem(6,QTableWidgetItem('Yer'))
 
         self.apply_earthquake_datas = QPushButton(text='Sorgula')
 
@@ -279,15 +338,26 @@ class LoadGui(QMainWindow):
 
         self.map_zoom_slider.valueChanged.connect(self.StartZoom)
         self.apply_earthquake_datas.clicked.connect(self.connect_api)
-        self.sort_earthquakes.clicked.connect(self.sort_recent_earthquakes_function)
-        self.show_recent_earthquakes_with_map.clicked.connect(self.draw_earthquakes_function)
+        self.sort_earthquakes.clicked.connect(self.worker_function_sorting_recent_earthquakes)
+        self.show_recent_earthquakes_with_map.clicked.connect(self.worker_show_recent_earthquakes_with_map)
 
 
         self.location_timer = QTimer(self)
         self.location_timer.timeout.connect(self.update_map_location)
         self.location_timer.start(1) 
     
-    def StartZoom(self):
+    def worker_function_sorting_recent_earthquakes(self):
+        thread = threading.Thread(target=self.sort_recent_earthquakes_function,daemon=True)
+        thread.start()
+    
+    def worker_show_recent_earthquakes_with_map(self):
+        thread = threading.Thread(target=self.draw_earthquakes_function,daemon=True)
+        thread.start()
+    
+
+
+        
+    def StartZoom(self):    
         self.zoom_level = self.map_zoom_slider.value()
         
         __Function = Create_map.ZoomMap.zoomMap(value=self.zoom_level,location=self.location,marker_locations=self.coordinates,popups=self.strings)
@@ -323,28 +393,11 @@ class LoadGui(QMainWindow):
 
             lim_data = self.limit_input.value()
 
-            host = CustomData(start=self.start_date_tokenized, end=self.end_date_tokenized, lim=lim_data)
+            signal = Signal()
+            signal.signal.emit( )
 
-            host_data = host.Parse()
-
-            for data in host_data:
-                MarkerFunction = Create_map.DrawEarthquakeZones(Map=self.new_map,
-                                            latitude=data[0],
-                                            Longtidue=data[1],
-                                            Magnitude=data[2],
-                                            Country=data[3],
-                                            City=data[4])
-                
-                self.coordinate_matris = [data[0],data[1]]
-                self.string_matris = [data[2],data[3],data[4]]
-
-                self.coordinates.append(self.coordinate_matris)
-                self.strings.append(self.string_matris)
-
-                MarkedMap = MarkerFunction.Draw()
-
-                self.webwidget.setHtml(MarkedMap.get_root().render())  
         except Exception as exception_1:
+            print(f'exception: {exception_1}')
             QMessageBox.critical(self,'Uyarı',f'{self.start_date} // {self.end_date} tarihleri arasında Deprem görülmemektedir!')
 
     def optimize_dates(self):
@@ -352,9 +405,7 @@ class LoadGui(QMainWindow):
         current_date = timezone.current_date(value).returner()
 
         self.recent_date.setDate(QDate().currentDate())
-        self.earthquake_date.setDate(current_date)
 
-        self.earthquake_date.setDate(QDate.currentDate())
 
     def draw_earthquakes_function(self):
         try:
@@ -363,7 +414,7 @@ class LoadGui(QMainWindow):
             
             self.earthquake_date.setDate(current_date)
 
-            self.recent_earthquakes_list.clear()
+            #self.recent_earthquakes_list.clear()
             
             self.new_map_recent = fl.Map(location=[39,35],
                                 zoom_start=6,
@@ -375,52 +426,48 @@ class LoadGui(QMainWindow):
             self.start_time_recent = self.start_time_setting.time().toPyTime()
             self.end_time_recent = self.end_time_setting.time().toPyTime()
 
-            print(self.start_date_recent)
-
             self.start_date_tokenized_recent = f'{self.end_date_recent}T{self.end_time_recent}'
             self.end_date_tokenized_recent = f'{self.start_date_recent}T{self.end_time_recent}'
 
             #lim_data = self.limit_input.value()
-            print(self.start_date_tokenized_recent)
-            print(self.end_date_tokenized_recent)
 
-            host_recent = CustomData(start=self.start_date_tokenized_recent, end=self.end_date_tokenized_recent, lim=self.limit_input_2.value())
+            self.nonetypearray = []
+            self.all_datas = []
 
-            host_data_recent = host_recent.Parse()
+            self.index = 0
+            self.user_index = 12 #example column number
 
-            for data in host_data_recent:
-                MarkerFunction_recent = Create_map.DrawEarthquakeZones(Map=self.new_map_recent,
-                                            latitude=data[0],
-                                            Longtidue=data[1],
-                                            Magnitude=data[2],
-                                            Country=data[3],
-                                            City=data[4])
-                
-                self.coordinate_matris_recent = [data[0],data[1]]
-                self.string_matris_recent = [data[2],data[3],data[4]]
 
-                self.coordinates_recent.append(self.coordinate_matris_recent)
-                self.strings_recent.append(self.string_matris_recent)
+            for row in range(self.recent_earthquakes_list.rowCount()):
+                self.index += 1
 
-                MarkedMap_recent = MarkerFunction_recent.Draw()
+                for column in range(self.recent_earthquakes_list.columnCount()):
+                    if row == self.user_index - 1:
+                        if self.recent_earthquakes_list.item(row,column) == None or self.recent_earthquakes_list.item(row,column) == '':
+                            self.nonetypearray.append(self.recent_earthquakes_list.item(row,column))
 
-                self.webwidget.setHtml(MarkedMap_recent.get_root().render())          
+                        else:
+                            self.all_datas.append(self.recent_earthquakes_list.item(row,column).text())
+            
+            print(self.all_datas)
+
         except Exception as exception_2:
-            QMessageBox.critical(self,'Uyarı',f'{self.start_date_recent} // {self.end_date_recent} tarihleri arasında Deprem görülmemektedir!')
+            QMessageBox.critical(self,'Uyarı',f'{self.start_date_recent} // {self.end_date_recent} tarihleri arasında Deprem görülmemektedir! {exception_2}')
 
     def sort_recent_earthquakes_function(self):
         try:
+            #https://deprem.afad.gov.tr/last-earthquakes.html
             value = self.day_selector.value()
             current_date = timezone.current_date(value).returner()
             
             self.earthquake_date.setDate(current_date)
 
-            self.recent_earthquakes_list.clear()
+            self.recent_earthquakes_list.clear() 
 
             self.start_date_recent = self.recent_date.date().toPyDate()
             self.end_date_recent = self.earthquake_date.date().toPyDate()
 
-            self.start_time_recent = self.start_time_setting.time().toPyTime()
+            self.start_time_recent = self.start_time_setting.time().toPyTime() 
             self.end_time_recent = self.end_time_setting.time().toPyTime()
 
             self.start_date_tokenized_f = f'{self.end_date_recent}T{self.end_time_recent}'
@@ -430,18 +477,28 @@ class LoadGui(QMainWindow):
             print(self.start_date_tokenized_f)
             print(self.end_date_tokenized_f)
 
-            host_recent = CustomData(start=self.start_date_tokenized_f, end=self.end_date_tokenized_f, lim=self.limit_input_2.value())
+            host_recentf = scrapping.ScrappingClass().returnerf()
 
-            host_data_recent_f = host_recent.Parse()
-
-            for data in host_data_recent_f:
-                datas = data[2:5]
-
-                formatted_string = QListWidgetItem(f'|| Ülke: {datas[1]} || Şehir: {datas[2]} || Büyüklük: {datas[0]} ||')
-                formatted_string.setTextAlignment(Qt.AlignCenter)
+            index = 0
+            for dataf in host_recentf:
                 
-                self.recent_earthquakes_list.addItem(formatted_string)
-                self.recent_earthquakes_list.setItemAlignment(Qt.AlignCenter)
+                timecode_item = QTableWidgetItem(str(dataf[0]))
+                latidude_item = QTableWidgetItem(str(dataf[1]))
+                longitude_item = QTableWidgetItem(str(dataf[2]))
+                depth_item = QTableWidgetItem(str(dataf[3]))
+                type_item = QTableWidgetItem(str(dataf[4]))
+                magnitude_item = QTableWidgetItem(str(dataf[5]))
+                location_item = QTableWidgetItem(str(dataf[6]))
+                
+                self.recent_earthquakes_list.setItem(index,1,timecode_item)
+                self.recent_earthquakes_list.setItem(index,2,latidude_item)
+                self.recent_earthquakes_list.setItem(index,3,longitude_item)
+                self.recent_earthquakes_list.setItem(index,4,depth_item)
+                self.recent_earthquakes_list.setItem(index,5,type_item)
+                self.recent_earthquakes_list.setItem(index,6,magnitude_item)
+                self.recent_earthquakes_list.setItem(index,7,location_item)
+
+                index += 1
 
         except Exception as exception_2:
             QMessageBox.critical(self,'Uyarı',f'{self.start_date_recent} // {self.end_date_recent} tarihleri arasında Deprem görülmemektedir! {exception_2}')
