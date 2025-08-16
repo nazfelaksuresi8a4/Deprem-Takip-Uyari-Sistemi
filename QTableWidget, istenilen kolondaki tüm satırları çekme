@@ -1,0 +1,54 @@
+from PyQt5.QtCore import*
+from PyQt5.QtGui import*
+from PyQt5.QtWidgets import*
+import sys as _s
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+        widget = QWidget()
+        widget.setLayout(layout)
+
+        self.tablewidget = QTableWidget()
+        self.apply_button = QPushButton(text='Apply')
+
+        layout.addWidget(self.tablewidget)
+        layout.addWidget(self.apply_button)
+
+        self.tablewidget.setRowCount(12)
+        self.tablewidget.setColumnCount(7)
+
+        for i in range(10):
+            for j in range(7):
+                data = QTableWidgetItem(str(i+1))
+
+                self.tablewidget.setItem(i,j,data)
+        
+        self.tablewidget.setItem(11,1,QTableWidgetItem('gosöfösifholö'))
+
+        self.apply_button.clicked.connect(self.return_col_datas)
+
+        self.setCentralWidget(widget)
+
+        self.nonetypearray = []
+
+        self.index = 0
+        self.user_index = 12 #example column number
+
+    def return_col_datas(self):
+        for row in range(self.tablewidget.rowCount()):
+            self.index += 1
+            for column in range(self.tablewidget.columnCount()):
+                if row == self.user_index - 1:
+                    if self.tablewidget.item(row,column) == None or self.tablewidget.item(row,column) == '':
+                        self.nonetypearray.append(self.tablewidget.item(row,column))
+
+                    else:
+                        f = list(self.tablewidget.item(row,column).text())
+
+if __name__=="__main__":
+    sp = QApplication(_s.argv)
+    sw = MainWindow()
+    sw.show()
+    _s.exit(sp.exec_())
