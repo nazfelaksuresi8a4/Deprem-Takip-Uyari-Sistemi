@@ -1,0 +1,62 @@
+from PyQt5.QtCore import*
+from PyQt5.QtWidgets import*
+from PyQt5.QtGui import*
+import sys as _s
+import time as _t
+
+class Signal(QObject):
+    signal = pyqtSignal(str)
+    
+    def __init__(self):
+        super().__init__()
+    
+    def run(self):
+        for i in range(12):
+            _t.sleep(1)
+            print(i)
+            f = i
+        
+        self.signal.emit(str(f))
+    
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        widget = QWidget()
+        layout = QVBoxLayout()
+        widget.setLayout(layout)
+
+        self.list = QListWidget()
+        self.button = QPushButton(text='Apply')
+
+        layout.addWidget(self.list)
+        layout.addWidget(self.button)
+
+        self.button.clicked.connect(self.call_threadf)
+
+        self.setCentralWidget(widget)
+
+    def call_threadf(self):
+        self.thread = QThread()
+        self.worker = Signal()
+        self.worker.moveToThread(self.thread)
+
+        self.thread.started.connect(self.worker.run)
+        self.worker.signal.connect(self.endd)
+
+        self.thread.start()
+
+    def endd(self):
+        print('ended')
+        
+
+        
+
+if __name__=="__main__":
+    sp = QApplication(_s.argv)
+    sw = MainWindow()
+    sw.show()
+    _s.exit(sp.exec_())
+
+
+#QThread büyük projelerde farklı threadlerde ayrı işlemlerin yürütülmesini sağlamak için kullanılan bir methotdur
