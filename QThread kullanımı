@@ -11,12 +11,12 @@ class Signal(QObject):
         super().__init__()
     
     def run(self):
-        for i in range(12):
+        for i in range(4):
             _t.sleep(1)
-            print(i)
+            #print(i)
             f = i
         
-        self.signal.emit(str(f))
+            self.signal.emit(str(f))
     
 
 class MainWindow(QMainWindow):
@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(widget)
 
-    def call_threadf(self):
+    def call_threadf(self,data):
         self.thread = QThread()
         self.worker = Signal()
         self.worker.moveToThread(self.thread)
@@ -46,8 +46,8 @@ class MainWindow(QMainWindow):
 
         self.thread.start()
 
-    def endd(self):
-        print('ended')
+    def endd(self,data):
+        print(data)
         
 
         
@@ -59,4 +59,13 @@ if __name__=="__main__":
     _s.exit(sp.exec_())
 
 
+
 #QThread büyük projelerde farklı threadlerde ayrı işlemlerin yürütülmesini sağlamak için kullanılan bir methotdur
+
+#thread ve worker değişkenleri bir kez tanımlandıktan sonra tekrar silinmemesi için self scopeu verilmelidir(farklı yöntemleride var)
+
+#ana thread içinde oluşturulan qthread nesnesine bağlı olan Signal sınıfı içindeki emit(f) sayesinde ana thread içinden ikincil thread yani Signal sınıfından fırlatılan veriyi pozisyonel argüman ile almamız mümkündür
+
+#UYARI: Signal sınıfı içindeki run kısmı widget işlemleri için uygun değildir sadece veri üretebilir işleyebilir dönen veriyi ana MainWindow sınıfınfa görselleştirmelisiniz
+
+
