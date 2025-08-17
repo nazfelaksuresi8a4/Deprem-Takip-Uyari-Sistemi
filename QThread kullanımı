@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(widget)
 
-    def call_threadf(self,data):
+    def call_threadf(self):
         self.thread = QThread()
         self.worker = Signal()
         self.worker.moveToThread(self.thread)
@@ -57,6 +57,7 @@ if __name__=="__main__":
     sw = MainWindow()
     sw.show()
     _s.exit(sp.exec_())
+
 
 
 
