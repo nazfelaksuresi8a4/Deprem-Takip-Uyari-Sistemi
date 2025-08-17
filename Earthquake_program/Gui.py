@@ -1,7 +1,7 @@
-from qtpy.QtCore import *
-from qtpy.QtWidgets import *
-from qtpy.QtGui import *
-from qtpy.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 import scrapping
 import Create_map
 from __Api import CustomData
@@ -13,21 +13,21 @@ import sys
 import folium as fl
 import threading
 
+html_array = []
+
 class Signal(QObject):
     signal = pyqtSignal(str)
 
-    def __init__(self,start_hmsmmy,end_hmsmmy,lim,coordinate_matris,coordinates,strings,string_matris,webwidget):
+    def __init__(self,start_hmsmmy,end_hmsmmy,lim,coordinates,strings,webwidget,new_map):
         super().__init__()
         self.start_hmsmmy = start_hmsmmy
         self.end_hmsmmy = end_hmsmmy
         self.lim_data = lim
-        self.coordinate_matris = coordinate_matris
         self.coordinates = coordinates
         self.strings = strings
         self.webwidget = webwidget
+        self.new_map = new_map
 
-        self.signal.connect(self.run)
-    
     def run(self):
         host_data = CustomData(start=self.start_hmsmmy, end=self.end_hmsmmy, lim=str(self.lim_data)).Parse()
 
@@ -39,6 +39,7 @@ class Signal(QObject):
                                             Magnitude=data[2],
                                             Country=data[3],
                                             City=data[4])
+            print(data)
                 
             self.coordinate_matris = [data[0],data[1]]
             self.string_matris = [data[2],data[3],data[4]]
@@ -48,9 +49,8 @@ class Signal(QObject):
                 
             MarkedMap = MarkerFunction.Draw()
 
-            self.webwidget.setHtml(MarkedMap.get_root().render())  
+            self.signal.emit(MarkedMap.get_root().render())
 
-            self.signal.disconnect()
 
 class LoadGui(QMainWindow):
     def __init__(self):
@@ -376,7 +376,7 @@ class LoadGui(QMainWindow):
     def RefreshMap(self):
         self.webwidget.reload()
     
-    def connect_api(self):
+    def connect_api(self, data):
         try:
             self.new_map = fl.Map(location=[39,35],
                                 zoom_start=6,
@@ -391,14 +391,27 @@ class LoadGui(QMainWindow):
             self.start_date_tokenized = f'{self.start_date}T{self.start_time}'
             self.end_date_tokenized = f'{self.end_date}T{self.end_time}'
 
-            lim_data = self.limit_input.value()
+            self.lim_data = self.limit_input.value()
 
-            signal = Signal()
-            signal.signal.emit( )
+            self.thread_ = QThread()
+            self.signal = Signal(self.start_date_tokenized,self.end_date_tokenized,self.lim_data,self.coordinates,self.strings,self.webwidget,self.new_map)
+            self.signal.moveToThread(self.thread_)
+
+            self.signal.signal.connect(self.update_html)
+            self.thread_.started.connect(self.signal.run)
+
+            self.thread_.start()
 
         except Exception as exception_1:
             print(f'exception: {exception_1}')
             QMessageBox.critical(self,'Uyarı',f'{self.start_date} // {self.end_date} tarihleri arasında Deprem görülmemektedir!')
+    
+    def update_html(self,html):
+        self.webwidget.setHtml(html)
+
+    def worker_api(self):
+        signal = Signal()
+        signal.signal.emit('test')
 
     def optimize_dates(self):
         value = self.day_selector.value()
