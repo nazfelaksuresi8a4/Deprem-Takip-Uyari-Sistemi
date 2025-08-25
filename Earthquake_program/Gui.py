@@ -207,7 +207,8 @@ class LoadGui(QMainWindow):
 
         self.recent_earthquakes_list = QTableWidget()
         self.sort_earthquakes = QPushButton(text='Son depremleri çek')
-        self.show_recent_earthquakes_with_map = QPushButton('Secili depremin detaylarını haritada göster')
+        self.show_recent_earthquake_with_map = QPushButton(text='Secili depremin detaylarını haritada göster')
+        self.show_recent_earthquakes_with_map = QPushButton(text='Secili depremlerin detaylarını haritada göster')
         
 
         self.start_time_splitter = QSplitter(Qt.Horizontal)
@@ -342,7 +343,9 @@ class LoadGui(QMainWindow):
         #self.recent_earthquakes_splitter.addWidget(self.day_selector)
         self.recent_earthquakes_splitter.addWidget(self.recent_earthquakes_list)
         self.recent_earthquakes_splitter.addWidget(self.sort_earthquakes)
+        self.recent_earthquakes_splitter.addWidget(self.show_recent_earthquake_with_map)
         self.recent_earthquakes_splitter.addWidget(self.show_recent_earthquakes_with_map)
+
         for _container in containerf:
             _container.setStyleSheet('background-color:rgb(25, 19, 19);border:none')
             _container.setAlignment(Qt.AlignCenter)
@@ -401,7 +404,8 @@ class LoadGui(QMainWindow):
         self.map_zoom_slider.valueChanged.connect(self.StartZoom)
         self.apply_earthquake_datas.clicked.connect(self.connect_api)
         self.sort_earthquakes.clicked.connect(self.worker_function_sorting_recent_earthquakes)
-        self.show_recent_earthquakes_with_map.clicked.connect(self.worker_show_recent_earthquakes_with_map)
+        self.show_recent_earthquake_with_map.clicked.connect(self.worker_show_recent_earthquakes_with_map)
+        self.show_recent_earthquakes_with_map.clicked.connect(self.worker_show_recent_earthquake_with_map)
         self.toolbar_button_heatmap.clicked.connect(self.change_heatmap)
         self.toolbar_button_marker.clicked.connect(self.change_classic_map)
 
@@ -417,6 +421,12 @@ class LoadGui(QMainWindow):
     def worker_show_recent_earthquakes_with_map(self):
         try:
             self.draw_earthquakes_function()
+        except Exception as exception:
+            print(f'hata: {exception}')
+
+    def worker_show_recent_earthquake_with_map(self):
+        try:
+            self.draw_earthquake_function()
         except Exception as exception:
             print(f'hata: {exception}')
         
@@ -579,6 +589,86 @@ Yer: {self.all_datas[6]}\n
         except Exception as exception_2:
             QMessageBox.critical(self,'Uyarı',f'{self.start_date_recent} // {self.end_date_recent} tarihleri arasında Deprem görülmemektedir! {exception_2}')
 
+    def draw_earthquake_function(self):
+        try:
+            lat_lon_array = []
+            array_like = []
+            string_matris = []
+
+            value = self.day_selector.value()
+            current_date = timezone.current_date(value).returner()
+            
+            self.earthquake_date.setDate(current_date)
+
+            #self.recent_earthquakes_list.clear()
+            
+            self.new_map_recent = fl.Map(location=[39,35],
+                                zoom_start=6,
+                                tiles='Cartodb dark_matter')
+            
+            self.start_date_recent = self.recent_date.date().toPyDate()
+            self.end_date_recent = self.earthquake_date.date().toPyDate()
+
+            self.start_time_recent = self.start_time_setting.time().toPyTime()
+            self.end_time_recent = self.end_time_setting.time().toPyTime()
+
+            self.start_date_tokenized_recent = f'{self.end_date_recent}T{self.end_time_recent}'
+            self.end_date_tokenized_recent = f'{self.start_date_recent}T{self.end_time_recent}'
+
+            #lim_data = self.limit_input.value()
+
+            self.nonetypearray = []
+            self.all_datas = []
+
+            #self.index = 0
+            #self.user_index = self.recent_earthquakes_list.currentRow() #example column number
+
+            for row in range(self.recent_earthquakes_list.rowCount()):
+                #self.index += 1
+                for column in range(self.recent_earthquakes_list.columnCount()):   
+                    if self.recent_earthquakes_list.item(row,column) == None or self.recent_earthquakes_list.item(row,column) == '':
+                        self.nonetypearray.append(self.recent_earthquakes_list.item(row,column))
+                        print('none     ',self.all_datas)
+
+                    else:
+                            self.all_datas.append(self.recent_earthquakes_list.item(row,column).text())
+                            print(self.all_datas)
+
+            changed_items = self.recent_earthquakes_list.selectedItems()
+
+            for item in changed_items:
+                lat_lon_array.append([float(self.recent_earthquakes_list.item(self.recent_earthquakes_list.row(item),1).text()),
+                                      float(self.recent_earthquakes_list.item(self.recent_earthquakes_list.row(item),2).text()),
+                                    ])
+                string_matris.append(f'''
+                                      Tarih(TS): {self.recent_earthquakes_list.item(self.recent_earthquakes_list.row(item),0).text()}\n
+                                      Enlem: {self.recent_earthquakes_list.item(self.recent_earthquakes_list.row(item),1).text()}\n
+                                      Boylam: {self.recent_earthquakes_list.item(self.recent_earthquakes_list.row(item),2).text()}\n
+                                      Derinlik: {self.recent_earthquakes_list.item(self.recent_earthquakes_list.row(item),3).text()}\n
+                                      Tip: {self.recent_earthquakes_list.item(self.recent_earthquakes_list.row(item),4).text()}\n
+                                      Büyüklük: {self.recent_earthquakes_list.item(self.recent_earthquakes_list.row(item),5).text()}\n
+                                      Yer: {self.recent_earthquakes_list.item(self.recent_earthquakes_list.row(item),6).text()}\n
+                                    ''')
+
+
+            if self.toolbar_map_type_label.text() == 'Harita gösterimi türü: Klasik harita':
+                for latitude_longitude,strings in zip(lat_lon_array,string_matris): 
+                        fl.Marker(location=latitude_longitude,
+                                popup=fl.Popup(strings,max_width=600,sticky=True,lazy=True),
+                                draggable=True,
+                                ).add_to(self.new_map_recent)
+                self.webwidget.setHtml(self.new_map_recent.get_root().render())    
+                
+
+            elif self.toolbar_map_type_label.text() == 'Harita gösterimi türü: Isı haritası':
+                HeatMap(data=lat_lon_array,
+                        min_opacity=float(self.all_datas[5]),
+                        ).add_to(self.new_map_recent)
+
+                self.webwidget.setHtml(self.new_map_recent.get_root().render())
+
+        except Exception as exception_2:
+            QMessageBox.critical(self,'Uyarı',f'{self.start_date_recent} // {self.end_date_recent} tarihleri arasında Deprem görülmemektedir! {exception_2}')
     def sort_recent_earthquakes_function(self):
         try:
             #https://deprem.afad.gov.tr/last-earthquakes.html
@@ -631,39 +721,39 @@ Yer: {self.all_datas[6]}\n
     def change_heatmap(self):
         self.toolbar_map_type_label.setText(f'Harita gösterimi türü: {str(self.toolbar_button_heatmap.text())}') 
         self.toolbar_button_heatmap.setStyleSheet('''background-color: orange;
-    color: white;
+    color: black;
     border: 0.7px solid rgb(177, 21, 21);
     border-radius: 4px;
     font-weight: bolder;
-    font-size: 15px;
+    font-size: 24px;
 }
 QPushButton:hover{
     background-color: rgb(92, 16, 16);
     color: rgb(108, 93, 7);
-    font-size: 14px;
+    font-size: 25;
 }
 QPushButton:pressed{
     background-color: red;
     color: gold;
-    font-size: 20px;
+    font-size: 30px;
 }''')
         
-        self.toolbar_button_marker.setStyleSheet('''background-color: orange;
-    color: white;
+        self.toolbar_button_marker.setStyleSheet('''background-color: white;
+    color: black;
     border: 0.7px solid rgb(177, 21, 21);
     border-radius: 4px;
     font-weight: bolder;
-    font-size: 15px;
+    font-size: 24px;
 }
 QPushButton:hover{
     background-color: rgb(92, 16, 16);
     color: rgb(108, 93, 7);
-    font-size: 14px;
+    font-size: 25;
 }
 QPushButton:pressed{
     background-color: red;
     color: gold;
-    font-size: 20px;
+    font-size: 30px;
 }''')
         
     def change_classic_map(self):
@@ -688,7 +778,7 @@ QPushButton:pressed{
 }''')
         
         self.toolbar_button_marker.setStyleSheet('''background-color: orange;
-    color: white;
+    color: black;
     border: 0.7px solid rgb(177, 21, 21);
     border-radius: 4px;
     font-weight: bolder;
@@ -744,7 +834,7 @@ QPushButton:pressed{
     font-size: 30px;
 }''')
         
-        self.toolbar_map_type_label.setText(f'Harita gösterimi türü: {str(self.toolbar_button_heatmap.text())}') 
+        self.toolbar_map_type_label.setText(f'Harita gösterimi türü: {str(self.toolbar_button_marker.text())}') 
     
 sp = QApplication(sys.argv) 
 
